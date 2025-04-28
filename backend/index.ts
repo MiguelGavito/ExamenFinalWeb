@@ -1,0 +1,14 @@
+import express from 'express';
+import cors from "cors";
+import employeeRoutes from './src/routes/employeeRoutes';
+
+const app = express();
+const PORT = 3000;
+
+app.use(cors());
+app.use(express.json());
+app.use("/api", employeeRoutes);
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+})
