@@ -1,73 +1,122 @@
-// src/app/login/page.tsx
-
 'use client';
+// este codigo es el mismo page que esta afuera
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const router = useRouter();
+  const [usuario, setUsuario] = useState('');
+  const [contraseña, setContraseña] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
 
-    const response = await fetch("http://localhost:3000/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        username,
-        password
-      })
-    });
+    try {
+      const res = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario, contraseña }),
+      });
+      const data = await res.json();
 
-    const data = await response.text(); 
-    if (response.ok) {
-      
-      window.location.href = "/welcome"; 
-    } else {
-      setErrorMessage(data); 
+      if (data.exito) {
+        const params = new URLSearchParams({
+          nombre: data.nombre,
+        });
+        router.push(`/welcomepage?${params.toString()}`);
+      } else {
+        setError('Usuario o contraseña no válidos');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Error de servidor. Inténtalo más tarde.');
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-semibold mb-6">Inicio de sesión</h2>
-        {errorMessage && <div className="text-red-500 mb-4">{errorMessage}</div>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="username" className="block text-gray-700">Usuario</label>
-            <input
-              type="text"
-              id="username"
-              className="w-full p-2 border border-gray-300 rounded-md"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-gray-700">Contraseña</label>
-            <input
-              type="password"
-              id="password"
-              className="w-full p-2 border border-gray-300 rounded-md"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Iniciar sesión
-          </button>
-        </form>
-      </div>
-    </div>
+    <main className="container">
+      <h1>Login</h1>
+      {error && <p className="error">{error}</p>}
+
+      <form onSubmit={handleSubmit}>
+        <label>
+          Usuario
+          <input
+            type="text"
+            value={usuario}
+            onChange={e => setUsuario(e.currentTarget.value)}
+            required
+          />
+        </label>
+
+        <label>
+          Contraseña
+          <input
+            type="password"
+            value={contraseña}
+            onChange={e => setContraseña(e.currentTarget.value)}
+            required
+          />
+        </label>
+
+        <button type="submit">Entrar</button>
+      </form>
+
+      <style jsx>{`
+        .container {
+          max-width: 400px;
+          margin: 4rem auto;
+          padding: 2rem;
+          background: #f9f9f9;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+          text-align: center;
+          margin-bottom: 1.5rem;
+          color: #333;
+        }
+        form {
+          display: flex;
+          flex-direction: column;
+        }
+        label {
+          display: flex;
+          flex-direction: column;
+          margin-bottom: 1rem;
+          font-weight: 500;
+          color: #555;
+        }
+        input {
+          margin-top: 0.5rem;
+          padding: 0.75rem;
+          font-size: 1rem;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        }
+        button {
+          margin-top: 1.5rem;
+          padding: 0.75rem;
+          font-size: 1rem;
+          background: #0070f3;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        button:hover {
+          background: #005bb5;
+        }
+        .error {
+          color: #e00;
+          margin-bottom: 1rem;
+          text-align: center;
+        }
+      `}</style>
+    </main>
   );
 }

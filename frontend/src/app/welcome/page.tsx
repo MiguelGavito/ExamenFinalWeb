@@ -1,29 +1,22 @@
-// src/app/welcome/page.tsx
+interface Props {
+  searchParams: { nombre?: string };
+}
 
-'use client';
+export default function WelcomePage({ searchParams }: Props) {
+  const nombre = searchParams.nombre || '';
 
-import { useEffect, useState } from 'react';
-
-export default function WelcomePage() {
-  const [userData, setUserData] = useState<any>(null);
-
-  useEffect(() => {
-    setUserData({ name: 'Juan Gómez', email: 'jgomez@skytech.com' });
-  }, []);
+  if (!nombre) {
+    return (
+      <main style={{ textAlign: 'center', marginTop: 100 }}>
+        <p>No has iniciado sesión. <a href="/">Volver al login</a></p>
+      </main>
+    );
+  }
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-semibold mb-6">Bienvenido</h2>
-        {userData ? (
-          <div>
-            <p><strong>Nombre:</strong> {userData.name}</p>
-            <p><strong>Correo:</strong> {userData.email}</p>
-          </div>
-        ) : (
-          <p>Cargando...</p>
-        )}
-      </div>
-    </div>
+    <main style={{ textAlign: 'center', marginTop: 100 }}>
+      <h1>¡Bienvenido/a, {nombre}!</h1>
+      <p>Disfruta de tu experiencia con SkyTech.</p>
+    </main>
   );
 }
